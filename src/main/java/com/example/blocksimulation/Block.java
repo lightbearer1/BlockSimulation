@@ -38,11 +38,20 @@ public class Block {
         this.data = data;
     }
 
-    @Override
+    /*@Override
     public String toString() {
         return "Block{" +
                 "index=" + index +
                 ", data=" + Arrays.toString(data) +
+                ", hash=" + booleanArrayToBinaryString(hash) +
+                ", previousHash=" + booleanArrayToBinaryString(previousHash) +
+                '}';
+    }*/
+    @Override
+    public String toString() {
+        return "Block{" +
+                "index=" + index +
+                ", data=" + new String(data) +
                 ", hash=" + booleanArrayToBinaryString(hash) +
                 ", previousHash=" + booleanArrayToBinaryString(previousHash) +
                 '}';

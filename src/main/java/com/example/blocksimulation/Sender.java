@@ -46,23 +46,28 @@ public class Sender extends Thread{
     public void run() {
         // code to run in Thread A
         boolean[] previousHash = new boolean[]{true,true,true,true};
+        //System.out.println("Message of sender is:\n");
         for (int i = 0; i < blockNumber; i++) {
-
-            //创建随机数据部分
-            byte[] data = getRandomString(10).getBytes();
-            //创建一个区块对象
-            Block block = new Block();
-            //把前一个区块的hash存入当前区块
-            block.setPreviousHash(previousHash);
-            block.setData(data);
-            //设置当前区块的hash
-            block.setHash(HashGenerator.hashGenerator(data,key,hashSize));
-            //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
-            previousHash = block.getHash();
-            boolean b = Receiver.receiveBlock(block, blockNumber);
-            if (b){
-                //System.err.println("success");
+            synchronized (this) {
+                //创建随机数据部分
+                byte[] data = getRandomString(10).getBytes();
+                //创建一个区块对象
+                Block block = new Block();
+                //把前一个区块的hash存入当前区块
+                block.setPreviousHash(previousHash);
+                block.setData(data);
+                //设置当前区块的hash
+                block.setHash(HashGenerator.hashGenerator(data, key, hashSize));
+                //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
+                previousHash = block.getHash();
+                boolean b = Receiver.receiveBlock(block, blockNumber);
+                if (b) {
+                    //System.err.println("success");
+                }
+                block.setIndex(i);
+                System.out.println("SENDER:"+block);
             }
+
         }
 
     }
