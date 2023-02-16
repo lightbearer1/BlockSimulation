@@ -38,7 +38,7 @@ public class Attacker extends Thread{
         this.data = data;
     }
 
-    public Attacker(int blockNumber,int attackNum,int hashSize,boolean isPrint) {
+    public Attacker(int blockNumber,int hashSize,int attackNum,boolean isPrint) {
         this.blockNumber = blockNumber;
         this.hashSize = hashSize;
         this.attackNum = attackNum;
@@ -48,8 +48,12 @@ public class Attacker extends Thread{
     public void run() {
         try {
 
+
             boolean[] previousHash = generateHash(hashSize);
             for (int i = 0; i < blockNumber*attackNum; i++) {
+                /*if (Receiver.isBeginReceive){
+                    this.start();
+                }*/
                 synchronized (this) {
                     //创建随机数据部分
                     byte[] data = "Error Block".getBytes();
@@ -61,15 +65,15 @@ public class Attacker extends Thread{
                     block.setHash(generateHash(hashSize));
                     //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
                     previousHash = block.getHash();
-                    boolean b = Receiver.receiveBlock(block, blockNumber);
-                    if (!b) {
+                    String b = Receiver.receiveBlock(block, blockNumber);
+                    if (b.equals("false")) {
                         if (isPrint) {
                             block.setIndex(i);
                             System.out.println("ATTACKER: No." + i + " attack FAILED:" + block);
                         }
 
                     }else {
-                        System.err.println("No." + i + " attack SUCCESS:" + block);
+                        System.out.println("No." + i + " attack SUCCESS:" + block);
                     }
                 }
 

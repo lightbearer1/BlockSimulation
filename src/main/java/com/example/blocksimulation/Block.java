@@ -31,11 +31,15 @@ public class Block {
     Map<Integer,Integer> blockAddress = new HashMap<Integer,Integer>();*/
 
     public Block() {
-
+        this.data = " ".getBytes();
+        this.hash = HashGenerator.byteToBoolen("0".getBytes());
+        this.previousHash = HashGenerator.byteToBoolen("0".getBytes());
     }
 
     public Block(byte[] data) {
         this.data = data;
+        this.hash = HashGenerator.byteToBoolen("0".getBytes());
+        this.previousHash = HashGenerator.byteToBoolen("0".getBytes());
     }
 
     /*@Override
