@@ -16,6 +16,7 @@ public class Block {
     //区块链的序号
     private int index;
     @Setter
+    @Getter
     // 区块中的数据部分
     private byte[] data;
     @Setter

@@ -1,5 +1,6 @@
 package com.example.blocksimulation;
 
+import com.sun.xml.internal.bind.v2.TODO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,8 @@ import java.util.Random;
 public class Sender extends Thread{
 
 
+    //用于控制攻击者线程什么时候开启
+    private  Thread attacker;
     @Getter
     @Setter
     //要发送的区块数量
@@ -33,6 +36,12 @@ public class Sender extends Thread{
     public Sender() {
     }
 
+    public Sender(int blockNumber, int hashSize,Thread attacker) {
+        this.blockNumber = blockNumber;
+        this.hashSize = hashSize;
+        this.attacker = attacker;
+    }
+
     public Sender(byte[] data) {
         this.data = data;
     }
@@ -44,31 +53,57 @@ public class Sender extends Thread{
 
     //发送者线程的执行方法
     public void run() {
-        // code to run in Thread A
-        boolean[] previousHash = new boolean[]{true,true,true,true};
-        //System.out.println("Message of sender is:\n");
-        for (int i = 0; i < blockNumber; i++) {
-            synchronized (this) {
-                //创建随机数据部分
-                byte[] data = getRandomString(10).getBytes();
-                //创建一个区块对象
-                Block block = new Block();
-                //把前一个区块的hash存入当前区块
-                block.setPreviousHash(previousHash);
-                block.setData(data);
-                //设置当前区块的hash
-                block.setHash(HashGenerator.hashGenerator(data, key, hashSize));
-                //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
-                previousHash = block.getHash();
-                String b = Receiver.receiveBlock(block, blockNumber);
-                /*if (b) {
-                    //System.err.println("success");
-                }*/
-                block.setIndex(i);
-                System.out.println("SENDER:"+block);
-            }
+        //while (!Attacker.shouldExecute) {
+            try {
 
-        }
+                // code to run in Thread A
+                boolean[] previousHash = new boolean[]{true, true, true, true};
+                //System.out.println("Message of sender is:\n");
+                for (int i = 0; i < blockNumber; i++) {
+                    //synchronized (this) {
+                    //创建随机数据部分
+                    byte[] data = getRandomString(10).getBytes();
+                    //创建一个区块对象
+                    Block block = new Block();
+                    //把前一个区块的hash存入当前区块
+                    block.setPreviousHash(previousHash);
+                    if (i == blockNumber - 1) {
+                        block.setData("End Chain".getBytes());
+                    } else {
+                        block.setData(data);
+                    }
+
+                    //设置当前区块的hash
+                    block.setHash(HashGenerator.hashGenerator(data, key, hashSize));
+                    //TODO 产生的hash应该尽量避免与上一个区块的hash相同，此处需要判断是否相同，是则修改当前hash
+                    //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
+                    previousHash = block.getHash();
+                    String b = Receiver.receiveBlock(block, blockNumber);
+
+                    /*if (b) {
+                        //System.err.println("success");
+                    }*/
+                    block.setIndex(i);
+                    System.out.println("SENDER:" + block);
+                    if ("End".equals(b)){
+                        break;
+                    }
+                    if (i == 0 && "true".equals(b)) {
+                        //Attacker.start();
+                        attacker.start();
+                    }
+                    Attacker.shouldExecute = true;
+                    while (Attacker.shouldExecute){
+                        if (!Attacker.shouldExecute)
+                            break;
+                    }
+                }
+
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+       // }
 
     }
     /**
