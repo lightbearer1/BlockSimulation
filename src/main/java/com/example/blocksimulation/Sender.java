@@ -91,7 +91,7 @@ public class Sender extends Thread{
                         //System.err.println("success");
                     }*/
                     block.setIndex(i);
-                    log.info("SENDER:" + block);
+                    //log.info("SENDER:" + block);
                     //System.out.println("SENDER:" + block);
                     if ("End".equals(b)){
                         break;

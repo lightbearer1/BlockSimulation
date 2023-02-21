@@ -81,12 +81,12 @@ public class Attacker extends Thread{
                         if (b.equals("false")) {
                             if (isPrint) {
                                 block.setIndex(index);
-                                log.info("ATTACKER: No." + index++ + " attack FAILED:" + block);
+                                //log.info("ATTACKER: No." + index++ + " attack FAILED:" + block);
                                 //System.out.println("ATTACKER: No." + index++ + " attack FAILED:" + block);
                             }
 
                         } else {
-                            log.warn("No." + index++ + " attack SUCCESS:" + block);
+                            //log.warn("No." + index++ + " attack SUCCESS:" + block);
                             //System.out.println("No." + index++ + " attack SUCCESS:" + block);
                         }
                     }

@@ -86,4 +86,9 @@ class BlockSimulationApplicationTests {
             programTwo.execute();
         }
     }
+
+    @Test
+    void drawGraph(){
+        //DrawGraph.drawGraph();
+    }
 }

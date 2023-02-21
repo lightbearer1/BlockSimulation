@@ -109,13 +109,13 @@ public class Receiver {
 
     public static int printBlockChain(){
 
-        System.out.println("The number of chain is "+blockChainNumber.size());
+        //System.out.println("The number of chain is "+blockChainNumber.size());
         for (int i = 0; i < blockChainNumber.size(); i++) {
-            log.info("The value of No."+(i+1)+" chain is:");
+            //log.info("The value of No."+(i+1)+" chain is:");
             //System.out.println("The value of No."+(i+1)+" chain is:");
             for (Block block:blockChainNumber.get(i)
                  ) {
-                log.info("  "+block.toString());
+                //log.info("  "+block.toString());
                 //System.out.println("  "+block.toString());
             }
         }
