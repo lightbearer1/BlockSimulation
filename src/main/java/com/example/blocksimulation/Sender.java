@@ -3,7 +3,9 @@ package com.example.blocksimulation;
 import com.sun.xml.internal.bind.v2.TODO;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -11,6 +13,7 @@ import java.util.Random;
  * 日期:2023/2/8 18:45
  * 描述:
  */
+@Slf4j
 public class Sender extends Thread{
 
 
@@ -72,10 +75,14 @@ public class Sender extends Thread{
                     } else {
                         block.setData(data);
                     }
-
+                    boolean[] thisHash = HashGenerator.hashGenerator(data, key, hashSize);
+                    //如果两个连续的区块hash值相同，那么更改当前的区块hash
+                    if (Arrays.equals(thisHash, previousHash)){
+                        thisHash[hashSize-1] = !thisHash[hashSize-1];
+                    }
                     //设置当前区块的hash
-                    block.setHash(HashGenerator.hashGenerator(data, key, hashSize));
-                    //TODO 产生的hash应该尽量避免与上一个区块的hash相同，此处需要判断是否相同，是则修改当前hash
+                    block.setHash(thisHash);
+
                     //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
                     previousHash = block.getHash();
                     String b = Receiver.receiveBlock(block, blockNumber);
@@ -84,7 +91,8 @@ public class Sender extends Thread{
                         //System.err.println("success");
                     }*/
                     block.setIndex(i);
-                    System.out.println("SENDER:" + block);
+                    log.info("SENDER:" + block);
+                    //System.out.println("SENDER:" + block);
                     if ("End".equals(b)){
                         break;
                     }
