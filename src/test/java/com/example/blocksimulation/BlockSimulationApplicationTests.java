@@ -105,8 +105,8 @@ class BlockSimulationApplicationTests {
 
         //控制每个不同数量攻击中样本的数量
         int numOfExecution = 1000;
-        //每次攻击中样本的平均数据
-        double[] AveQuantity = new double[numOfExecution];
+        //存放循环后的结果
+        double[] result = new double[numOfExecution];
 
         //错误链路的数量
         double numOfIllegalChain = 0;
@@ -117,7 +117,7 @@ class BlockSimulationApplicationTests {
                 //链路总数量
                 double numOfAllChain = 0;
                 //存放链路数据的集合
-                List<Double> result = new ArrayList<>();
+                List<Double> resultList = new ArrayList<>();
                 double total = 0;
                 for (int i = 1; i < numOfExecution; i++) {
                     //控制模拟的链路总数量保持在1000附近
@@ -141,6 +141,7 @@ class BlockSimulationApplicationTests {
                     int numOfChain = Receiver.printBlockChain();
                     numOfAllChain += numOfChain;
 
+
                     //log.warn(String.valueOf(numOfChain));
 
                     //初始化接收者数据---------------------------------------
@@ -151,18 +152,116 @@ class BlockSimulationApplicationTests {
 
                     //total+=numOfChain;
                     //log.info(String.valueOf(total));
-                    AveQuantity[i] = numOfChain;
+                    //result[i] = numOfChain;
                     if (numOfChain > 1) {
                         for (int j = 2; j <= numOfChain; j++) {
-                            result.add((double) hashSize);
+                            resultList.add((double) hashSize);
                         }
                     }
                 }
-                //AveQuantity[j] = total/numOfExecution;
-                System.out.println(hashSize + ":" + result.size());
+
+                System.out.println(hashSize + ":" + resultList.size());
                 System.out.println(hashSize + ":" + numOfAllChain);
-                //DrawGraph.drawGraph(AveQuantity,j+1);
-                //log.debug(String.valueOf(AveQuantity[attackNumber]));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (attacker != null) {
+                //overThread = true;
+                attacker.interrupt();
+            }
+            if (sender != null) {
+                //overThread = true;
+                sender.interrupt();
+            }
+
+        }
+    }
+
+    @Test
+    void testLoop2(){
+
+        int endNumber = 11;
+        Variable variable = new Variable("hashSize",11);
+        Thread attacker = null;
+        Thread sender = null;
+
+
+        //控制每个不同数量攻击中样本的数量
+        int numOfExecution = 1000;
+        //存放循环后的结果
+        //double[] result = new double[numOfExecution];
+
+        /*//存放链路数据的集合
+        List<Double> resultList = new ArrayList<>();*/
+
+        //错误链路的数量
+        double numOfIllegalChain = 0;
+
+
+
+
+        try {
+
+            for (int temp = variable.getValue(); temp < endNumber; temp++) {
+
+                switch (variable.getValueName()){
+                    case "blockNumber":
+                        variable.setBlockNumber(temp);
+                        break;
+                    case "hashSize":
+                        variable.setHashSize(temp);
+                        break;
+                    case "attackNumer":
+                        variable.setAttackNumber(temp);
+                        break;
+                }
+
+                //链路总数量
+                double numOfAllChain = 0;
+
+                //存放链路数据的集合
+                List<Double> resultList = new ArrayList<>();
+                double total = 0;
+                for (int i = 1; i < numOfExecution; i++) {
+                    //控制模拟的链路总数量保持在1000附近
+                    if (numOfAllChain >= 1000) {
+                        System.out.println(i);
+                        break;
+                    }
+
+                    //创建多线程
+                    //variable.getBlockNumber(), variable.getHashSize(), variable.getAttackNumber()
+                    attacker = new Thread(new Attacker(variable.getBlockNumber(), variable.getHashSize(), variable.getAttackNumber()), "Attacker");
+                    sender = new Thread(new Sender(variable.getBlockNumber(), variable.getHashSize(), attacker), "Sender");
+                    sender.start();
+
+                    Thread.sleep(50);
+
+                    //返回生成的链路数量
+                    int numOfChain = Receiver.printBlockChain();
+                    numOfAllChain += numOfChain;
+
+                    //初始化接收者数据---------------------------------------
+                    Receiver.mainBlockChain = new CopyOnWriteArrayList<>();
+                    Receiver.blockChainNumber = new CopyOnWriteArrayList<>();
+                    Receiver.index = 0;
+                    Receiver.previousHash = new boolean[]{true, true, true, true};
+
+                    //total+=numOfChain;
+                    //log.info(String.valueOf(total));
+                    //result[i] = numOfChain;
+                    if (numOfChain > 1) {
+                        for (int j = 2; j <= numOfChain; j++) {
+                            resultList.add((double) temp);
+                        }
+                    }
+                }
+
+                System.out.println(variable.getValueName()+" is "+temp + ",resultList.size():" + resultList.size());
+                System.out.println(variable.getValueName()+" is "+temp + ",numOfAllChain:" + numOfAllChain);
+
             }
         } catch (Exception e) {
             e.printStackTrace();

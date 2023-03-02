@@ -17,18 +17,18 @@ import javax.swing.JFrame;
 public class DrawGraph {
 
 
-    public static void drawGraph(double[] values,int attackNum) {
+    public static void drawGraph(double[] values,int value,String valueName) {
 
 
         // 创建数据集
         //double[] values = new double[]{1.0, 1.5, 2.0, 2.5, 2.5, 3.0, 3.5, 3.5, 3.5, 4.0, 4.0, 4.0, 4.0, 4.5, 5.0};
         HistogramDataset dataset = new HistogramDataset();
-        dataset.addSeries("数据集", values, 10); // 5表示将数据分为5个区间
+        dataset.addSeries("数据集", values, value); // value表示将数据分为value个区间
 
         // 创建直方图
         //JFreeChart chart = ChartFactory.createHistogram("直方图示例", null, null, dataset, PlotOrientation.VERTICAL, false, false, false);
         JFreeChart chart = ChartFactory.createHistogram(
-                "histogram of attack "+attackNum, // 图表标题
+                "histogram of attack "+valueName, // 图表标题
                 "X-occurrences", // 横坐标标签
                 "Y-number of time", // 纵坐标标签
                 dataset, // 数据集
