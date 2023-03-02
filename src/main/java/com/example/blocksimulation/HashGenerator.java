@@ -22,7 +22,7 @@ public final class HashGenerator {
      * @param hashSize  生成的hash大小
      * @return 生成boolen[]类型的hash
      */
-    public static boolean[] hashGenerator(byte[] data,int key,int hashSize){
+    public synchronized static boolean[] hashGenerator(byte[] data, int key, int hashSize){
         //*************合并data和key****************
         byte[] keyByte = Integer.toString(key).getBytes();
         byte[] temp = new byte[data.length + keyByte.length];
@@ -30,7 +30,7 @@ public final class HashGenerator {
         System.arraycopy(keyByte, 0, temp, data.length, keyByte.length);
 
         //**********对合并后的数据进行异或运算，求得hash*******
-        int blockSize = data.length / hashSize;
+        int blockSize = Math.max(data.length / hashSize, 1); // 修正 blockSize
         boolean[] dataBoolen = byteToBoolen(temp);
         boolean[] result = new boolean[hashSize];
         for (int i = 0; i < hashSize; i++) {

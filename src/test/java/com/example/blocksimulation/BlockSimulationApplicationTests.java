@@ -182,14 +182,14 @@ class BlockSimulationApplicationTests {
     @Test
     void testLoop2(){
 
-        int endNumber = 11;
-        Variable variable = new Variable("hashSize",11);
+        int endNumber = 12;
+        Variable variable = new Variable("hashSize",6);
         Thread attacker = null;
         Thread sender = null;
 
 
         //控制每个不同数量攻击中样本的数量
-        int numOfExecution = 1000;
+        int numOfExecution = 100;
         //存放循环后的结果
         //double[] result = new double[numOfExecution];
 
@@ -253,7 +253,9 @@ class BlockSimulationApplicationTests {
                     //log.info(String.valueOf(total));
                     //result[i] = numOfChain;
                     if (numOfChain > 1) {
+                        numOfIllegalChain += numOfChain - 1;
                         for (int j = 2; j <= numOfChain; j++) {
+
                             resultList.add((double) temp);
                         }
                     }
@@ -261,10 +263,12 @@ class BlockSimulationApplicationTests {
 
                 System.out.println(variable.getValueName()+" is "+temp + ",resultList.size():" + resultList.size());
                 System.out.println(variable.getValueName()+" is "+temp + ",numOfAllChain:" + numOfAllChain);
+                System.out.println(numOfIllegalChain);
 
             }
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println(e);
         } finally {
             if (attacker != null) {
                 //overThread = true;
