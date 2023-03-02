@@ -2,17 +2,17 @@ package com.example.blocksimulation;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+
+import static com.example.blocksimulation.BlockSimulationApplication.overThread;
 
 /**
  * 作者:wyq
  * 日期:2023/2/8 18:47
  * 描述:
  */
-@Slf4j
 public class Attacker extends Thread{
 
 
@@ -50,6 +50,12 @@ public class Attacker extends Thread{
         this.data = data;
     }
 
+    public Attacker(int blockNumber,int hashSize,int attackNum) {
+        this.blockNumber = blockNumber;
+        this.hashSize = hashSize;
+        this.attackNum = attackNum;
+    }
+
     public Attacker(int blockNumber,int hashSize,int attackNum,boolean isPrint) {
         this.blockNumber = blockNumber;
         this.hashSize = hashSize;
@@ -81,16 +87,16 @@ public class Attacker extends Thread{
                         if (b.equals("false")) {
                             if (isPrint) {
                                 block.setIndex(index);
-                                //log.info("ATTACKER: No." + index++ + " attack FAILED:" + block);
                                 //System.out.println("ATTACKER: No." + index++ + " attack FAILED:" + block);
                             }
 
                         } else {
-                            //log.warn("No." + index++ + " attack SUCCESS:" + block);
                             //System.out.println("No." + index++ + " attack SUCCESS:" + block);
                         }
                     }
                     shouldExecute = false;
+                    if (overThread)
+                        break;
                 /*if (Receiver.isBeginReceive){
                     this.start();
                 }*/

@@ -17,7 +17,7 @@ import javax.swing.JFrame;
 public class DrawGraph {
 
 
-    public static void drawGraph(double[] values) {
+    public static void drawGraph(double[] values,int attackNum) {
 
 
         // 创建数据集
@@ -28,13 +28,13 @@ public class DrawGraph {
         // 创建直方图
         //JFreeChart chart = ChartFactory.createHistogram("直方图示例", null, null, dataset, PlotOrientation.VERTICAL, false, false, false);
         JFreeChart chart = ChartFactory.createHistogram(
-                "Number of attacks - number of links", // 图表标题
-                "X-number of attacks", // 横坐标标签
-                "Y-number of chains", // 纵坐标标签
+                "histogram of attack "+attackNum, // 图表标题
+                "X-occurrences", // 横坐标标签
+                "Y-number of time", // 纵坐标标签
                 dataset, // 数据集
                 PlotOrientation.VERTICAL, // 图表方向
-                true, // 是否包含图例
-                true, // 是否包含提示
+                false, // 是否包含图例
+                false, // 是否包含提示
                 false // 是否包含URL链接
         );
         // 设置直方图的颜色

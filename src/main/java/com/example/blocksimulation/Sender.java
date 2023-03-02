@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Arrays;
 import java.util.Random;
 
+import static com.example.blocksimulation.BlockSimulationApplication.overThread;
+
 /**
  * 作者:wyq
  * 日期:2023/2/8 18:45
@@ -102,6 +104,10 @@ public class Sender extends Thread{
                     }
                     Attacker.shouldExecute = true;
                     while (Attacker.shouldExecute){
+                        if (overThread){
+                            break;
+                        }
+
                         if (!Attacker.shouldExecute)
                             break;
                     }

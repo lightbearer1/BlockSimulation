@@ -3,10 +3,12 @@ package com.example.blocksimulation;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.example.blocksimulation.TaskOne.getPoissonRandom;
 
@@ -90,5 +92,90 @@ class BlockSimulationApplicationTests {
     @Test
     void drawGraph(){
         //DrawGraph.drawGraph();
+    }
+
+    @Test
+    void loop(){
+        int blockNumber = 10;
+        int hashSizeStart = 6;
+        int hashSizeEnd = 12;
+        int attackNumber = 10;
+        Thread attacker = null;
+        Thread sender = null;
+
+        //控制每个不同数量攻击中样本的数量
+        int numOfExecution = 1000;
+        //每次攻击中样本的平均数据
+        double[] AveQuantity = new double[numOfExecution];
+
+        //错误链路的数量
+        double numOfIllegalChain = 0;
+
+
+        try {
+            for (int hashSize = hashSizeStart; hashSize < hashSizeEnd; hashSize++) {
+                //链路总数量
+                double numOfAllChain = 0;
+                //存放链路数据的集合
+                List<Double> result = new ArrayList<>();
+                double total = 0;
+                for (int i = 1; i < numOfExecution; i++) {
+                    //控制模拟的链路总数量保持在1000附近
+                    if (numOfAllChain > 1000) {
+                        System.out.println(i);
+                        break;
+                    }
+
+                    //创建多线程
+                    attacker = new Thread(new Attacker(blockNumber, hashSize, attackNumber), "Attacker");
+                    sender = new Thread(new Sender(blockNumber, hashSize, attacker), "Sender");
+                    sender.start();
+
+                    Thread.sleep(30);
+                    ////log.info("_______________________________________________________________________");
+                    //System.out.println("_______________________________________________________________________");
+                    //Thread.sleep(2000);
+                    ////log.info("after attack,the received message is:");
+                    //System.out.println("after attack,the received message is:");
+                    //返回生成的链路数量
+                    int numOfChain = Receiver.printBlockChain();
+                    numOfAllChain += numOfChain;
+
+                    //log.warn(String.valueOf(numOfChain));
+
+                    //初始化接收者数据---------------------------------------
+                    Receiver.mainBlockChain = new CopyOnWriteArrayList<>();
+                    Receiver.blockChainNumber = new CopyOnWriteArrayList<>();
+                    Receiver.index = 0;
+                    Receiver.previousHash = new boolean[]{true, true, true, true};
+
+                    //total+=numOfChain;
+                    //log.info(String.valueOf(total));
+                    AveQuantity[i] = numOfChain;
+                    if (numOfChain > 1) {
+                        for (int j = 2; j <= numOfChain; j++) {
+                            result.add((double) hashSize);
+                        }
+                    }
+                }
+                //AveQuantity[j] = total/numOfExecution;
+                System.out.println(hashSize + ":" + result.size());
+                System.out.println(hashSize + ":" + numOfAllChain);
+                //DrawGraph.drawGraph(AveQuantity,j+1);
+                //log.debug(String.valueOf(AveQuantity[attackNumber]));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (attacker != null) {
+                //overThread = true;
+                attacker.interrupt();
+            }
+            if (sender != null) {
+                //overThread = true;
+                sender.interrupt();
+            }
+
+        }
     }
 }
