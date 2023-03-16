@@ -18,7 +18,7 @@ public class BlockSimulationApplication {
     public static void main(String[] args) throws InterruptedException {
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
         int endNumber = 15;
-        int value = 5;
+        int value = 6;
         //hashSize的图像
         Variable variableHash = new Variable("hashSize",value);
         value = variableHash.getValue();
@@ -38,8 +38,7 @@ public class BlockSimulationApplication {
     }
 
     public double[] loopSimulation(Variable variable,int endNumber){
-        //终止的数字
-        //endNumber = 12;
+
 
         Thread attacker = null;
         Thread sender = null;
@@ -84,7 +83,7 @@ public class BlockSimulationApplication {
                 for (int i = 1; i < numOfExecution; i++) {
                     //控制模拟的链路总数量保持在1000附近
                     if (numOfAllChain >= 1000) {
-                        System.out.println(i);
+                        System.out.println("Number of loops:"+i);
                         break;
                     }
 
@@ -94,10 +93,10 @@ public class BlockSimulationApplication {
                     sender = new Thread(new Sender(variable.getBlockNumber(), variable.getHashSize(), attacker), "Sender");
                     sender.start();
 
-                    Thread.sleep(50);
+                    Thread.sleep(30);
 
                     //返回生成的链路数量
-                    int numOfChain = Receiver.printBlockChain();
+                    int numOfChain = Receiver.printBlockChain(variable.getBlockNumber());
                     numOfAllChain += numOfChain;
 
                     //初始化接收者数据---------------------------------------
@@ -118,7 +117,7 @@ public class BlockSimulationApplication {
                 }
 
                 System.out.println(variable.getValueName()+" is "+temp + ",number of error chains:" + resultListTest.size());
-                System.out.println(variable.getValueName()+" is "+temp + ",number of all chain:" + numOfAllChain);
+                System.out.println(variable.getValueName()+" is "+temp + ",number of all chains:" + numOfAllChain);
 
             }
         } catch (Exception e) {

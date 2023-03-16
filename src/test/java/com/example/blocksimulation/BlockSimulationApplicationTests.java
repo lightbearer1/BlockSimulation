@@ -102,6 +102,7 @@ class BlockSimulationApplicationTests {
         int attackNumber = 10;
         Thread attacker = null;
         Thread sender = null;
+        Variable variable = new Variable();
 
         //控制每个不同数量攻击中样本的数量
         int numOfExecution = 1000;
@@ -138,7 +139,7 @@ class BlockSimulationApplicationTests {
                     ////log.info("after attack,the received message is:");
                     //System.out.println("after attack,the received message is:");
                     //返回生成的链路数量
-                    int numOfChain = Receiver.printBlockChain();
+                    int numOfChain = Receiver.printBlockChain(variable.getBlockNumber());
                     numOfAllChain += numOfChain;
 
 
@@ -182,7 +183,7 @@ class BlockSimulationApplicationTests {
     @Test
     void testLoop2(){
 
-        int endNumber = 12;
+        int endNumber = 7;
         Variable variable = new Variable("hashSize",6);
         Thread attacker = null;
         Thread sender = null;
@@ -240,7 +241,7 @@ class BlockSimulationApplicationTests {
                     Thread.sleep(50);
 
                     //返回生成的链路数量
-                    int numOfChain = Receiver.printBlockChain();
+                    int numOfChain = Receiver.printBlockChain(variable.getBlockNumber());
                     numOfAllChain += numOfChain;
 
                     //初始化接收者数据---------------------------------------

@@ -69,9 +69,11 @@ public class Receiver {
                 if (Arrays.equals(block.getPreviousHash(), chain.get(chain.size()-1).getPreviousHash())) {
                     //创建一个新的链路分支，并且将当前的链路复制给新的分支
                     List<Block> newChain = new ArrayList<>(chain);
+                    //这一步是把当前链路的上一个区块和当前接收区块替换，从而创建新链路
                     newChain.remove(chain.size()-1);
                     block.setIndex(chain.size()-1);
                     newChain.add(block);
+                    //给链路集合添加新建的链路
                     blockChainNumber.add(newChain);
                     //return "true";
                     recStatu = true;
@@ -107,18 +109,32 @@ public class Receiver {
 
     }
 
-    public static int printBlockChain(){
+    public static int printBlockChain(int blockNumber){
 
-        /*System.out.println("The number of chain is "+blockChainNumber.size());
+        //System.out.println("The number of chain is "+blockChainNumber.size());
+        //*****************对链路进行筛选，去除大小不符合要求的明显非法链路****************
+        //这么做是为了避免出现同时读取和删除集合操作导致的同步异常
+        //用于存储要删除的链路序号
+        List<Integer> removeNumber = new ArrayList<>();
+        //循环链路集合，判断是否大小不符
         for (int i = 0; i < blockChainNumber.size(); i++) {
-            log.info("The value of No."+(i+1)+" chain is:");
+            //log.info("The value of No."+(i+1)+" chain is:");
             //System.out.println("The value of No."+(i+1)+" chain is:");
-            for (Block block:blockChainNumber.get(i)
+            if (blockChainNumber.get(i).size()!=blockNumber){
+                //存储要删除的链路序号
+                removeNumber.add(i);
+                continue;
+            }
+            /*for (Block block:blockChainNumber.get(i)
                  ) {
                 log.info("  "+block.toString());
                 //System.out.println("  "+block.toString());
-            }
-        }*/
+            }*/
+        }
+        for (int i = 0; i < removeNumber.size(); i++) {
+            //最后进行一起移除
+            blockChainNumber.remove(removeNumber.get(i));
+        }
 
         return blockChainNumber.size();
     }
