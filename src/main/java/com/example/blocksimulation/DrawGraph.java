@@ -1,13 +1,20 @@
 package com.example.blocksimulation;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Arrays;
+import java.util.Map;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
+import org.knowm.xchart.CategoryChart;
+import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.SwingWrapper;
+
 import javax.swing.JFrame;
 /**
  * Author: wyq
@@ -15,6 +22,40 @@ import javax.swing.JFrame;
  * Desc  :
  */
 public class DrawGraph {
+
+    /**
+     * 使用xchart绘制直方图
+     * @param listX 横坐标数据
+     * @param listY 纵坐标数据
+     */
+    public static void drawGraph2(List<Integer> listX, Map<String,List<Double>> listY){
+        CategoryChart chart = new CategoryChartBuilder()
+                .width(800)
+                .height(600)
+                .title("Number-Probability Histogram")
+                .xAxisTitle("Error probability")
+                .yAxisTitle("number")
+                .build();
+
+        //设置标签是否可见
+        //chart.getStyler().setLegendVisible(false);
+        //设置网格是否可见
+        chart.getStyler().setPlotBorderVisible(false);
+
+        //添加绘图数据
+        for (String valueName : listY.keySet()) {
+            chart.addSeries(valueName,listX,listY.get(valueName));
+        }
+
+
+        //添加绘图数据
+        /*chart.addSeries("hash size",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.3,0.22,0.15));
+        chart.addSeries("attack number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.44,0.22,0.55));
+        chart.addSeries("block number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.35,0.42,0.35));*/
+
+        //进行展示
+        new SwingWrapper<CategoryChart>(chart).displayChart();
+    }
 
 
     public static void drawGraph(double[] values,int value,String valueName) {

@@ -1,6 +1,9 @@
 package com.example.blocksimulation;
 
 import org.junit.jupiter.api.Test;
+import org.knowm.xchart.CategoryChart;
+import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.SwingWrapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.security.NoSuchAlgorithmException;
@@ -281,5 +284,33 @@ class BlockSimulationApplicationTests {
             }
 
         }
+
     }
+
+    @Test
+    void testChart() throws InterruptedException {
+        CategoryChart chart = new CategoryChartBuilder()
+                .width(800)
+                .height(600)
+                .title("标题")
+                .xAxisTitle("错误概率")
+                .yAxisTitle("number")
+                .build();
+
+        //设置标签是否可见
+        //chart.getStyler().setLegendVisible(true);
+        //设置网格是否可见
+        //chart.getStyler().setPlotBorderVisible(false);
+
+
+        //添加绘图数据
+        chart.addSeries("hash size",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.3,0.22,0.15));
+        chart.addSeries("attack number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.44,0.22,0.55));
+        chart.addSeries("block number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.35,0.42,0.35));
+
+        //进行展示
+        new SwingWrapper<CategoryChart>(chart).displayChart();
+
+    }
+
 }

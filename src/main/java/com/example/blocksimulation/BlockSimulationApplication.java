@@ -3,10 +3,7 @@ package com.example.blocksimulation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @SpringBootApplication
@@ -19,25 +16,41 @@ public class BlockSimulationApplication {
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
         int endNumber = 15;
         int value = 6;
-        //hashSize的图像
+        //创建集合存放要模拟的区间,作为图表的x轴
+        List<Integer> listXAxis = new ArrayList<>();
+        for (int i = value;i < endNumber;i++){
+            listXAxis.add(i);
+        }
+        //创建存放数据集合的集合，作为图表的y轴
+        Map<String,List<Double>> listYAxis = new HashMap<>();
+
+        //hashSize的数据
         Variable variableHash = new Variable("hashSize",value);
-        value = variableHash.getValue();
-        double[] doubles = new BlockSimulationApplication().loopSimulation(variableHash, endNumber);
-        DrawGraph.drawGraph(doubles,endNumber-1-value,variableHash.getValueName());
+        List<Double> listForHashSize = new BlockSimulationApplication().loopSimulation(variableHash, endNumber);
+        listYAxis.put(variableHash.getValueName(), listForHashSize);
 
-        //attackNumber的图像
+        //attackNumber的数据
         Variable variableAtt = new Variable("attackNumber",value);
-        value = variableAtt.getValue();
-        DrawGraph.drawGraph(new BlockSimulationApplication().loopSimulation(variableAtt, endNumber),endNumber-1-value,variableAtt.getValueName());
+        List<Double> listAttackNumber = new BlockSimulationApplication().loopSimulation(variableAtt, endNumber);
+        listYAxis.put(variableAtt.getValueName(), listAttackNumber);
 
-        //block的图像
+        //block的数据
         Variable variableBlock = new Variable("blockNumber",value);
-        value = variableBlock.getValue();
-        DrawGraph.drawGraph(new BlockSimulationApplication().loopSimulation(variableBlock, endNumber),endNumber-1-value,variableBlock.getValueName());
+        List<Double> listBlockNumber = new BlockSimulationApplication().loopSimulation(variableBlock, endNumber);
+        listYAxis.put(variableBlock.getValueName(), listBlockNumber);
+
+        DrawGraph.drawGraph2(listXAxis,listYAxis);
+        //DrawGraph.drawGraph(new BlockSimulationApplication().loopSimulation(variableBlock, endNumber),endNumber-1-value,variableBlock.getValueName());
 
     }
 
-    public double[] loopSimulation(Variable variable,int endNumber){
+    /**
+     * 攻击模拟
+     * @param variable 一个特殊对象，存放了各个属性变量
+     * @param endNumber 攻击模拟的上限
+     * @return 出现错误链路的概率
+     */
+    public List<Double> loopSimulation(Variable variable, int endNumber) {
 
 
         Thread attacker = null;
@@ -49,20 +62,20 @@ public class BlockSimulationApplication {
         //存放循环后的结果
         //double[] result = new double[numOfExecution];
 
-        //存放链路数据的集合
-        List<Double> resultList = new ArrayList<>();
+        //存放所有的链路数据的集合
+        //List<Double> resultList = new ArrayList<>();
 
         //错误链路的数量
         double numOfIllegalChain = 0;
 
 
-
-
+        List<Double> probabilityList = null;
         try {
+            probabilityList = new ArrayList<>();
 
             for (int temp = variable.getValue(); temp < endNumber; temp++) {
 
-                switch (variable.getValueName()){
+                switch (variable.getValueName()) {
                     case "blockNumber":
                         variable.setBlockNumber(temp);
                         break;
@@ -77,13 +90,13 @@ public class BlockSimulationApplication {
                 //链路总数量
                 double numOfAllChain = 0;
 
-                //存放链路数据的集合
+                //存放每一次循环的链路数据
                 List<Double> resultListTest = new ArrayList<>();
                 double total = 0;
                 for (int i = 1; i < numOfExecution; i++) {
                     //控制模拟的链路总数量保持在1000附近
-                    if (numOfAllChain >= 1000) {
-                        System.out.println("Number of loops:"+i);
+                    if (numOfAllChain >= 500) {
+                        System.out.println("Number of loops:" + i);
                         break;
                     }
 
@@ -110,14 +123,18 @@ public class BlockSimulationApplication {
                     //result[i] = numOfChain;
                     if (numOfChain > 1) {
                         for (int j = 2; j <= numOfChain; j++) {
-                            resultList.add((double) temp);
+                            //resultList.add((double) temp);
                             resultListTest.add((double) temp);
                         }
                     }
                 }
 
-                System.out.println(variable.getValueName()+" is "+temp + ",number of error chains:" + resultListTest.size());
-                System.out.println(variable.getValueName()+" is "+temp + ",number of all chains:" + numOfAllChain);
+                double probability = resultListTest.size() / numOfAllChain;
+                probabilityList.add(probability);
+
+                System.out.println(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
+                System.out.println(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
+                System.out.println(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
 
             }
         } catch (Exception e) {
@@ -133,7 +150,7 @@ public class BlockSimulationApplication {
             }
 
         }
-        return listToDoubleArray(resultList);
+        return probabilityList;
     }
 
 
