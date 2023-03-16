@@ -32,15 +32,15 @@ public class DrawGraph {
         CategoryChart chart = new CategoryChartBuilder()
                 .width(800)
                 .height(600)
-                .title("Number-Probability Histogram")
-                .xAxisTitle("Error probability")
-                .yAxisTitle("number")
+                .title("Number-Probability Histogram")  //标题
+                .xAxisTitle("Value number")             //横坐标
+                .yAxisTitle("Error probability")        //纵坐标
                 .build();
 
         //设置标签是否可见
-        //chart.getStyler().setLegendVisible(false);
+        chart.getStyler().setLegendVisible(true);
         //设置网格是否可见
-        chart.getStyler().setPlotBorderVisible(false);
+        chart.getStyler().setPlotBorderVisible(true);
 
         //添加绘图数据
         for (String valueName : listY.keySet()) {
