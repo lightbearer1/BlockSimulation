@@ -27,6 +27,11 @@ public class Block {
     @Getter
     //前一个区块的hash值
     private boolean[] previousHash;
+
+    @Setter
+    @Getter
+    //一个用于标记链路是否含有非法区块的特殊属性，默认为true
+    private boolean isLegal = true;
     /*@Getter
     //用于记录该区块以及该区块之前的区块地址
     Map<Integer,Integer> blockAddress = new HashMap<Integer,Integer>();*/

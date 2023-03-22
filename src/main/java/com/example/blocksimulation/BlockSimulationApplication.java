@@ -14,8 +14,8 @@ public class BlockSimulationApplication {
 
     public static void main(String[] args) throws InterruptedException {
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
-        int endNumber = 15;
-        int value = 6;
+        int endNumber =13;
+        int value = 7;
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxis = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
@@ -57,7 +57,7 @@ public class BlockSimulationApplication {
         Thread sender = null;
 
 
-        //控制每个不同数量攻击中样本的数量
+        //控制循环的最大次数
         int numOfExecution = 1000;
         //存放循环后的结果
         //double[] result = new double[numOfExecution];
@@ -71,8 +71,10 @@ public class BlockSimulationApplication {
 
         List<Double> probabilityList = null;
         try {
+            //TODO 把每条链路的详情打印到日志
             probabilityList = new ArrayList<>();
 
+            //判断选择的是什么
             for (int temp = variable.getValue(); temp < endNumber; temp++) {
 
                 switch (variable.getValueName()) {
@@ -93,7 +95,7 @@ public class BlockSimulationApplication {
                 //存放每一次循环的链路数据
                 List<Double> resultListTest = new ArrayList<>();
                 double total = 0;
-                for (int i = 1; i < numOfExecution; i++) {
+                for (int i = 1; i <= numOfExecution; i++) {
                     //控制模拟的链路总数量
                     /*
                       使用蒙特卡洛方法计算该次数：
@@ -136,8 +138,12 @@ public class BlockSimulationApplication {
 
                     Thread.sleep(30);
 
-                    //返回生成的链路数量
-                    int numOfChain = Receiver.printBlockChain(variable.getBlockNumber());
+                    //返回结果集，里面包含非法链路数量以及链路数组数据
+                    Map<String, Object> result = Receiver.printBlockChain(variable.getBlockNumber());
+                    //获得当前链路数组里所有链路的数量
+                    int numOfChain = (int)result.get("numberOfAllChain");
+                    //List<List<Block>> chainList = (List) result.get("chain");
+                    //累计总链路数量
                     numOfAllChain += numOfChain;
 
                     //初始化接收者数据---------------------------------------
@@ -149,14 +155,31 @@ public class BlockSimulationApplication {
                     //total+=numOfChain;
                     //log.info(String.valueOf(total));
                     //result[i] = numOfChain;
-                    if (numOfChain > 1) {
+
+                   /* //对链路进行再次迭代
+                    for (List<Block> list:chainList) {
+                        //判断链路数组中的链路是否存在非法区块(检查链路的第一个区块isLegal属性)
+                        if (!list.get(0).isLegal()){
+                            resultListTest.add((double) temp);
+                        }
+                    }
+                    *//*if (numOfChain >= 1) {
+                        if (numOfChain==1){
+
+
+                        }
                         for (int j = 2; j <= numOfChain; j++) {
                             //resultList.add((double) temp);
                             resultListTest.add((double) temp);
                         }
+                    }*/
+                    //检查当前参数出现了多少条非法链路
+                    for (int j = 0; j < (int)result.get("illegalChainNumber"); j++) {
+                        resultListTest.add((double) temp);
                     }
                 }
 
+                //计算错误链路的概率
                 double probability = resultListTest.size() / numOfAllChain;
                 probabilityList.add(probability);
 

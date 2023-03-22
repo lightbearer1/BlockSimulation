@@ -97,7 +97,7 @@ class BlockSimulationApplicationTests {
         //DrawGraph.drawGraph();
     }
 
-    @Test
+    /*@Test
     void loop(){
         int blockNumber = 10;
         int hashSizeStart = 6;
@@ -181,9 +181,9 @@ class BlockSimulationApplicationTests {
             }
 
         }
-    }
+    }*/
 
-    @Test
+    /*@Test
     void testLoop2(){
 
         int endNumber = 7;
@@ -197,8 +197,8 @@ class BlockSimulationApplicationTests {
         //存放循环后的结果
         //double[] result = new double[numOfExecution];
 
-        /*//存放链路数据的集合
-        List<Double> resultList = new ArrayList<>();*/
+        //存放链路数据的集合
+        List<Double> resultList = new ArrayList<>();
 
         //错误链路的数量
         double numOfIllegalChain = 0;
@@ -285,7 +285,7 @@ class BlockSimulationApplicationTests {
 
         }
 
-    }
+    }*/
 
     @Test
     void testChart() throws InterruptedException {

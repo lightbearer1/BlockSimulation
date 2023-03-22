@@ -2,9 +2,7 @@ package com.example.blocksimulation;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -38,7 +36,7 @@ public class Receiver {
 
     public synchronized static String receiveBlock(Block block,int blockNumber){
         boolean recStatu = false;
-        List<Block> preChain = null;
+        //List<Block> preChain = null;
         //TODO 应该要检查传入的区块preHash和以前的所有区块的hash是否有相同的，这些也会产生分支链路
         //判断当前是否没有任何区块链，如果是则添加主链路到链路集合
         if (blockChainNumber.size()==0){
@@ -73,6 +71,11 @@ public class Receiver {
                     newChain.remove(chain.size()-1);
                     block.setIndex(chain.size()-1);
                     newChain.add(block);
+
+                    //如果接收到了非法区块，那么将这条链路的第一个区块设置标记，isLegal置为false
+                    if (Arrays.equals("Error Block".getBytes(), block.getData())) {
+                        newChain.get(0).setLegal(false);
+                    }
                     //给链路集合添加新建的链路
                     blockChainNumber.add(newChain);
                     //return "true";
@@ -87,9 +90,14 @@ public class Receiver {
                 //用于比较初始区块是否合法
                 if (Arrays.equals(block.getPreviousHash(), previousHash)){
                     block.setIndex(index++);
-                    //更改当前状态为开始接收消息
-                    //isBeginReceive=true;
                     chain.add(block);
+                    //判断是否标记了这条链路的第一个区块，若isLegal为false说明这条链路有非法区块
+                    if (!chain.get(0).isLegal()) {
+                        //如果接收到了非法区块，那么将这条链路的第一个区块设置标记，isLegal置为false
+                        if (Arrays.equals("Error Block".getBytes(), block.getData())) {
+                            chain.get(0).setLegal(false);
+                        }
+                    }
                     previousHash=block.getHash();
                     //return "true";
                     recStatu = true;
@@ -109,34 +117,61 @@ public class Receiver {
 
     }
 
-    public static int printBlockChain(int blockNumber){
+    /**
+     * 对最终数据进行处理并打印结果
+     * @param blockNumber 额定区块的数量，用于初步筛选链路是否合法
+     * @return 一个包含链路相关数据的结果集
+     */
+    public synchronized static Map<String, Object> printBlockChain(int blockNumber){
+
+        //作为一个返回的结果集
+        Map<String,Object> result = new HashMap<>();
+        //存放包含错误区块链路的数量
+        int illegalChainNumber = 0;
 
         //System.out.println("The number of chain is "+blockChainNumber.size());
         //*****************对链路进行筛选，去除大小不符合要求的明显非法链路****************
         //这么做是为了避免出现同时读取和删除集合操作导致的同步异常
         //用于存储要删除的链路序号
-        List<Integer> removeNumber = new ArrayList<>();
+        List<List<Block>> removeChain = new ArrayList<>();
         //循环链路集合，判断是否大小不符
         for (int i = 0; i < blockChainNumber.size(); i++) {
-            //log.info("The value of No."+(i+1)+" chain is:");
-            //System.out.println("The value of No."+(i+1)+" chain is:");
+
             if (blockChainNumber.get(i).size()!=blockNumber){
                 //存储要删除的链路序号
-                removeNumber.add(i);
-                continue;
+                removeChain.add(blockChainNumber.get(i));
             }
-            /*for (Block block:blockChainNumber.get(i)
-                 ) {
+        }
+        log.debug("****************************************************************");
+        if (removeChain.size()>0){
+            log.debug("The illegal links that are deprecated are:");
+        }
+        for (List<Block> chain : removeChain) {
+            //最后进行一起移除/*/
+            log.warn(String.valueOf(chain));
+            blockChainNumber.remove(chain);
+        }
+        log.debug("---------------------------------------------------------------");
+        log.debug("The number of received chains is "+blockChainNumber.size());
+        //迭代链路数组
+        for (int i = 0; i < blockChainNumber.size(); i++) {
+            //判断链路数组中的链路是否存在非法区块(检查链路的第一个区块isLegal属性)
+            if (!blockChainNumber.get(i).get(0).isLegal()){
+                //每发现一条非法链路就加一
+                illegalChainNumber++;
+            }
+            log.debug("The value of No."+(i+1)+" chain is:");
+            //打印每条链路的内容，此处仅为日志打印
+            for (Block block:blockChainNumber.get(i)) {
                 log.info("  "+block.toString());
                 //System.out.println("  "+block.toString());
-            }*/
+            }
         }
-        for (int i = 0; i < removeNumber.size(); i++) {
-            //最后进行一起移除
-            blockChainNumber.remove(removeNumber.get(i));
-        }
+        result.put("chain",blockChainNumber);
+        result.put("illegalChainNumber",illegalChainNumber);
+        result.put("numberOfAllChain",blockChainNumber.size());
 
-        return blockChainNumber.size();
+        return result;
     }
 
 
