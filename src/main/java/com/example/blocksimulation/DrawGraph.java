@@ -29,6 +29,7 @@ public class DrawGraph {
      * @param listY 纵坐标数据
      */
     public static void drawGraph2(List<Integer> listX, Map<String,List<Double>> listY){
+        //创建绘图对象
         CategoryChart chart = new CategoryChartBuilder()
                 .width(800)
                 .height(600)
@@ -43,7 +44,11 @@ public class DrawGraph {
         chart.getStyler().setPlotBorderVisible(true);
 
         //添加绘图数据
+        //q: 这个循环是如何运作的？
+        //a: listY里面是一个map，key是valueName，value是一个list，list里面是double类型的数据
         for (String valueName : listY.keySet()) {
+            //q: listY里面是什么？
+            //a: listY里面是一个map，key是valueName，value是一个list，list里面是double类型的数据
             chart.addSeries(valueName,listX,listY.get(valueName));
         }
 
@@ -54,7 +59,7 @@ public class DrawGraph {
         chart.addSeries("block number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.35,0.42,0.35));*/
 
         //进行展示
-        new SwingWrapper<CategoryChart>(chart).displayChart();
+        new SwingWrapper<>(chart).displayChart();
     }
 
 

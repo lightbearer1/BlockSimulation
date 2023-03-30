@@ -13,8 +13,9 @@ public class BlockSimulationApplication {
 
 
     public static void main(String[] args) throws InterruptedException {
+        log.debug("<---------------New Function--------------->");
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
-        int endNumber =13;
+        int endNumber =8;
         int value = 7;
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxis = new ArrayList<>();
@@ -26,7 +27,9 @@ public class BlockSimulationApplication {
 
         //hashSize的数据
         Variable variableHash = new Variable("hashSize",value);
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
         List<Double> listForHashSize = new BlockSimulationApplication().loopSimulation(variableHash, endNumber);
+        //将模拟结果存放到集合中
         listYAxis.put(variableHash.getValueName(), listForHashSize);
 
         //attackNumber的数据
@@ -39,7 +42,9 @@ public class BlockSimulationApplication {
         List<Double> listBlockNumber = new BlockSimulationApplication().loopSimulation(variableBlock, endNumber);
         listYAxis.put(variableBlock.getValueName(), listBlockNumber);
 
+        //调用画图函数
         DrawGraph.drawGraph2(listXAxis,listYAxis);
+        log.debug("          End of the function\n\n");
         //DrawGraph.drawGraph(new BlockSimulationApplication().loopSimulation(variableBlock, endNumber),endNumber-1-value,variableBlock.getValueName());
 
     }
@@ -53,12 +58,13 @@ public class BlockSimulationApplication {
     public List<Double> loopSimulation(Variable variable, int endNumber) {
 
 
+        //创建一个线程，用于发送区块和攻击
         Thread attacker = null;
         Thread sender = null;
 
 
         //控制循环的最大次数
-        int numOfExecution = 1000;
+        int numOfExecution = 1;
         //存放循环后的结果
         //double[] result = new double[numOfExecution];
 
@@ -69,12 +75,13 @@ public class BlockSimulationApplication {
         double numOfIllegalChain = 0;
 
 
+        //作为结果集存放不通参数下的错误链路概率
         List<Double> probabilityList = null;
         try {
             //TODO 把每条链路的详情打印到日志
             probabilityList = new ArrayList<>();
 
-            //判断选择的是什么
+            //判断选择的是什么变量
             for (int temp = variable.getValue(); temp < endNumber; temp++) {
 
                 switch (variable.getValueName()) {
@@ -180,12 +187,18 @@ public class BlockSimulationApplication {
                 }
 
                 //计算错误链路的概率
-                double probability = resultListTest.size() / numOfAllChain;
+                double probability = 0;
+                if(resultListTest.size()==0&&numOfAllChain==0){
+                    probability = 0;
+                }
+                else
+                    probability = resultListTest.size() / numOfAllChain;
                 probabilityList.add(probability);
 
                 System.out.println(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
                 System.out.println(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
                 System.out.println(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
+                System.out.println("——————————————————————————————");
 
             }
         } catch (Exception e) {
@@ -205,6 +218,7 @@ public class BlockSimulationApplication {
     }
 
 
+    //将List<Double>转换为double[]
     public double[] listToDoubleArray(List<Double> list){
         double[] array = new double[list.size()];
         for (int i = 0; i < list.size(); i++) {

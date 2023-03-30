@@ -83,8 +83,14 @@ public class Attacker extends Thread{
                         block.setHash(generateHash(hashSize));
                         //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
                         previousHash = block.getHash();
+                        //发送区块
                         String b = Receiver.receiveBlock(block, blockNumber);
+                        //判断是否攻击成功
                         if (b.equals("false")) {
+                            //q: isPrint的值为多少
+                            //a: 0
+                            //q: isPrint的值是否会改变
+                            //
                             if (isPrint) {
                                 block.setIndex(index);
                                 //System.out.println("ATTACKER: No." + index++ + " attack FAILED:" + block);
@@ -94,6 +100,10 @@ public class Attacker extends Thread{
                             //System.out.println("No." + index++ + " attack SUCCESS:" + block);
                         }
                     }
+                    //q: 这个变量的作用是什么？
+                    //a: 用于控制攻击线程的状态
+                    //q:如何控制状态
+                    //a:当攻击线程的状态为false时，攻击线程会停止攻击
                     shouldExecute = false;
                     if (overThread)
                         break;
@@ -111,11 +121,12 @@ public class Attacker extends Thread{
     }
 
     /**
-     * 用于生成区块
+     * 用于生成区块(已弃用)
      */
     public void generateAttackBlock() throws NoSuchAlgorithmException {
-
+        //生成前一个区块的hash
         boolean[] previousHash = generateHash(hashSize);
+        //此处理论上应该采用泊松分布来分配攻击次数，但是由于多线程的特性也近似的达到了想要的效果
         for (int i = 0; i < blockNumber*attackNum; i++) {
             //创建随机数据部分
             byte[] data = "Error Block".getBytes();

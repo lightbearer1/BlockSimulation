@@ -144,15 +144,19 @@ public class Receiver {
         }
         log.debug("****************************************************************");
         if (removeChain.size()>0){
-            log.debug("The illegal links that are deprecated are:");
+            log.debug("The Illegal links removed include:");
         }
         for (List<Block> chain : removeChain) {
             //最后进行一起移除/*/
+            /*for (Block block:chain) {
+                log.warn(block.toString());
+            }
+            log.debug("\n------------");*/
             log.warn(String.valueOf(chain));
             blockChainNumber.remove(chain);
         }
         log.debug("---------------------------------------------------------------");
-        log.debug("The number of received chains is "+blockChainNumber.size());
+        log.debug("There are "+blockChainNumber.size()+" links in total");
         //迭代链路数组
         for (int i = 0; i < blockChainNumber.size(); i++) {
             //判断链路数组中的链路是否存在非法区块(检查链路的第一个区块isLegal属性)
