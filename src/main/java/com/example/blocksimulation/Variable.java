@@ -3,6 +3,8 @@ package com.example.blocksimulation;
 import lombok.Getter;
 import lombok.Setter;
 
+import static org.apache.commons.math3.util.ArithmeticUtils.pow;
+
 /**
  * Author: wyq
  * Date  : 2023/3/2 19:39
@@ -10,18 +12,20 @@ import lombok.Setter;
  */
 public class Variable {
 
-    @Setter
-    @Getter
-    //攻击区块的数量
-    private int attackNumber = 10;
+
     @Setter
     @Getter
     //区块数量
     private int blockNumber = 10;
+
     @Setter
     @Getter
-    //hash的大小
-    private int hashSize = 8;
+    //默认hash的大小
+    private int hashSize = 12;
+    @Setter
+    @Getter
+    //默认攻击区块的数量
+    private int attackNumber = pow(2,hashSize);
     @Setter
     @Getter
     private String valueName;
@@ -40,7 +44,7 @@ public class Variable {
             case "hashSize":
                 this.hashSize = value;
                 break;
-            case "attackNumer":
+            case "attackNumber":
                 this.attackNumber = value;
                 break;
         }

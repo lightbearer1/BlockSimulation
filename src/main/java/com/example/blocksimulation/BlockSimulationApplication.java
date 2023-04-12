@@ -6,6 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static java.lang.Math.pow;
+
 @SpringBootApplication
 @Slf4j
 public class BlockSimulationApplication {
@@ -15,8 +17,8 @@ public class BlockSimulationApplication {
     public static void main(String[] args) throws InterruptedException {
         log.debug("<---------------New Function--------------->");
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
-        int endNumber =8;
-        int value = 7;
+        int endNumber =16;
+        int value = 8;
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxis = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
@@ -64,7 +66,7 @@ public class BlockSimulationApplication {
 
 
         //控制循环的最大次数
-        int numOfExecution = 1;
+        int numOfExecution = 1000;
         //存放循环后的结果
         //double[] result = new double[numOfExecution];
 
@@ -78,21 +80,29 @@ public class BlockSimulationApplication {
         //作为结果集存放不通参数下的错误链路概率
         List<Double> probabilityList = null;
         try {
-            //TODO 把每条链路的详情打印到日志
+
+            //q: probabilityList变量是干什么的？
+            //
             probabilityList = new ArrayList<>();
+
 
             //判断选择的是什么变量
             for (int temp = variable.getValue(); temp < endNumber; temp++) {
-
+                //设置攻击次数，要求符合hashsize>=log2attacknumber
+                int attackNumber = (int) (pow(2,8)-12+temp);
+                //TODO 此处应该hashsize>log2attacknumber
                 switch (variable.getValueName()) {
                     case "blockNumber":
                         variable.setBlockNumber(temp);
                         break;
                     case "hashSize":
+                        //设置AttackNumber的值和hashsize保持在hashsize>=log2 AttackNumber
                         variable.setHashSize(temp);
+                        variable.setAttackNumber((int) pow(2,8));
                         break;
-                    case "attackNum":
-                        variable.setAttackNumber(temp);
+                    case "attackNumber":
+                        //2^8+11-temp用于控制attackNumber的值在hashsize=8时，它的值应该在2^8左右
+                        variable.setAttackNumber(attackNumber);
                         break;
                 }
 
@@ -125,7 +135,7 @@ public class BlockSimulationApplication {
                       By substituting the given standard deviation s=7.544 and the expected value E (x)=0.479 into the formula, it can be obtained that:
                       N = [(1.645 * 7.544) / 0.479]^2 = 429.54
                      */
-                    if (numOfAllChain >= 430) {
+                    if (numOfAllChain >= 1000) {
                         //求得每次模拟结果的数学期望
                         double ex = ((double) resultListTest.size())/(i-1);
                         //计算每次模拟的标准差
@@ -195,10 +205,17 @@ public class BlockSimulationApplication {
                     probability = resultListTest.size() / numOfAllChain;
                 probabilityList.add(probability);
 
-                System.out.println(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
-                System.out.println(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
-                System.out.println(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
-                System.out.println("——————————————————————————————");
+                if (variable.getValueName().equals("attackNumber")){
+                    System.out.println(variable.getValueName() + " is " + attackNumber + ",number of error chains:" + resultListTest.size());
+                    System.out.println(variable.getValueName() + " is " + attackNumber + ",number of all chains:" + numOfAllChain);
+                    System.out.println(variable.getValueName() + " is " + attackNumber + ",Probability of erroneous links :" + probability);
+                    System.out.println("——————————————————————————————");
+                }else {
+                    System.out.println(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
+                    System.out.println(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
+                    System.out.println(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
+                    System.out.println("——————————————————————————————");
+                }
 
             }
         } catch (Exception e) {
@@ -228,6 +245,7 @@ public class BlockSimulationApplication {
         return array;
     }
 
+
     /**
      * 用于计算模拟结果的标准差
      * @param results results是一个double类型的数组，包含了n次模拟的结果
@@ -237,7 +255,7 @@ public class BlockSimulationApplication {
     public double calculateVariance(double[] results, double mean) {
         double variance = 0;
         for (double result : results) {
-            variance += Math.pow(result - mean, 2);
+            variance += pow(result - mean, 2);
         }
         return Math.sqrt(variance / (results.length - 1));
     }
