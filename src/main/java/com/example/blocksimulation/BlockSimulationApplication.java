@@ -19,33 +19,53 @@ public class BlockSimulationApplication {
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
         int endNumber =16;
         int value = 8;
-        //创建集合存放要模拟的区间,作为图表的x轴
-        List<Integer> listXAxis = new ArrayList<>();
-        for (int i = value;i < endNumber;i++){
-            listXAxis.add(i);
-        }
+
+        //创建存放数据集合的集合，作为图表的x轴
+        Map<String,List<Integer>> listXAxis = new HashMap<>();
         //创建存放数据集合的集合，作为图表的y轴
         Map<String,List<Double>> listYAxis = new HashMap<>();
 
-        //hashSize的数据
+
+        //*******************hashSize的数据*********************
         Variable variableHash = new Variable("hashSize",value);
         //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
-        List<Double> listForHashSize = new BlockSimulationApplication().loopSimulation(variableHash, endNumber);
+        List<Double> listYAxisForHashSize = new BlockSimulationApplication().loopSimulation(variableHash, endNumber);
+        //创建集合存放要模拟的区间,作为图表的x轴
+        List<Integer> listXAxisHashsize = new ArrayList<>();
+        for (int i = value;i < endNumber;i++){
+            listXAxisHashsize.add(i);
+        }
         //将模拟结果存放到集合中
-        listYAxis.put(variableHash.getValueName(), listForHashSize);
+        listXAxis.put(variableHash.getValueName(),listXAxisHashsize);
+        listYAxis.put(variableHash.getValueName(), listYAxisForHashSize);
 
-        //attackNumber的数据
-        Variable variableAtt = new Variable("attackNumber",value);
-        List<Double> listAttackNumber = new BlockSimulationApplication().loopSimulation(variableAtt, endNumber);
-        listYAxis.put(variableAtt.getValueName(), listAttackNumber);
+        //****************attackNumber的数据***********************
+        Variable variableAttack = new Variable("attackNumber",value);
+        List<Double> listYAxisAttackNumber = new BlockSimulationApplication().loopSimulation(variableAttack, endNumber);
+        //创建集合存放要模拟的区间,作为图表的x轴
+        List<Integer> listXAxisAttackNumber = new ArrayList<>();
+        for (int i = value;i < endNumber;i++){
+            listXAxisAttackNumber.add((int) (pow(2,9)-20*12+20*i));
+        }
+        //将模拟结果存放到集合中
+        listXAxis.put(variableAttack.getValueName(), listXAxisAttackNumber);
+        listYAxis.put(variableAttack.getValueName(), listYAxisAttackNumber);
 
-        //block的数据
+        //*********************block的数据******************************
         Variable variableBlock = new Variable("blockNumber",value);
-        List<Double> listBlockNumber = new BlockSimulationApplication().loopSimulation(variableBlock, endNumber);
-        listYAxis.put(variableBlock.getValueName(), listBlockNumber);
+        List<Double> listYAxisBlockNumber = new BlockSimulationApplication().loopSimulation(variableBlock, endNumber);
+        //创建集合存放要模拟的区间,作为图表的x轴
+        List<Integer> listXAxisBlockNumber = new ArrayList<>();
+        for (int i = value;i < endNumber;i++){
+            listXAxisBlockNumber.add(i);
+        }
+        //将模拟结果存放到集合中
+        listXAxis.put(variableBlock.getValueName(), listXAxisBlockNumber);
+        listYAxis.put(variableBlock.getValueName(), listYAxisBlockNumber);
 
         //调用画图函数
         DrawGraph.drawGraph2(listXAxis,listYAxis);
+        DrawGraph.drawLineChart(listXAxis,listYAxis);
         log.debug("          End of the function\n\n");
         //DrawGraph.drawGraph(new BlockSimulationApplication().loopSimulation(variableBlock, endNumber),endNumber-1-value,variableBlock.getValueName());
 
@@ -89,16 +109,17 @@ public class BlockSimulationApplication {
             //判断选择的是什么变量
             for (int temp = variable.getValue(); temp < endNumber; temp++) {
                 //设置攻击次数，要求符合hashsize>=log2attacknumber
-                int attackNumber = (int) (pow(2,8)-12+temp);
+                int attackNumber = (int) (pow(2,9)-20*12+20*temp);
                 //TODO 此处应该hashsize>log2attacknumber
                 switch (variable.getValueName()) {
                     case "blockNumber":
                         variable.setBlockNumber(temp);
+                        //variable.setAttackNumber();
                         break;
                     case "hashSize":
                         //设置AttackNumber的值和hashsize保持在hashsize>=log2 AttackNumber
                         variable.setHashSize(temp);
-                        variable.setAttackNumber((int) pow(2,8));
+                        variable.setAttackNumber((int) (pow(2,8)));
                         break;
                     case "attackNumber":
                         //2^8+11-temp用于控制attackNumber的值在hashsize=8时，它的值应该在2^8左右
@@ -135,7 +156,7 @@ public class BlockSimulationApplication {
                       By substituting the given standard deviation s=7.544 and the expected value E (x)=0.479 into the formula, it can be obtained that:
                       N = [(1.645 * 7.544) / 0.479]^2 = 429.54
                      */
-                    if (numOfAllChain >= 1000) {
+                    if (numOfAllChain >= 500) {
                         //求得每次模拟结果的数学期望
                         double ex = ((double) resultListTest.size())/(i-1);
                         //计算每次模拟的标准差

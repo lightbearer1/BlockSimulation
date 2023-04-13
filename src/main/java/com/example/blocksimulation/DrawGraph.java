@@ -13,6 +13,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.CategoryChartBuilder;
+import org.knowm.xchart.CategorySeries;
 import org.knowm.xchart.SwingWrapper;
 
 import javax.swing.JFrame;
@@ -28,28 +29,31 @@ public class DrawGraph {
      * @param listX 横坐标数据
      * @param listY 纵坐标数据
      */
-    public static void drawGraph2(List<Integer> listX, Map<String,List<Double>> listY){
-        //创建绘图对象
-        CategoryChart chart = new CategoryChartBuilder()
-                .width(800)
-                .height(600)
-                .title("Number-Probability Histogram")  //标题
-                .xAxisTitle("Value number")             //横坐标
-                .yAxisTitle("Error probability")        //纵坐标
-                .build();
+    public static void drawGraph2(Map<String,List<Integer>> listX, Map<String,List<Double>> listY){
+        for (String valueName : listY.keySet()) {
+            //创建绘图对象
+            CategoryChart chart = new CategoryChartBuilder()
+                    .width(800)
+                    .height(600)
+                    .title("Number-Probability Histogram")  //标题
+                    .xAxisTitle("Value number")             //横坐标
+                    .yAxisTitle("Error probability")        //纵坐标
+                    .build();
 
-        //设置标签是否可见
-        chart.getStyler().setLegendVisible(true);
-        //设置网格是否可见
-        chart.getStyler().setPlotBorderVisible(true);
+            //设置标签是否可见
+            chart.getStyler().setLegendVisible(true);
+            //设置网格是否可见
+            chart.getStyler().setPlotBorderVisible(true);
 
         //添加绘图数据
         //q: 这个循环是如何运作的？
         //a: listY里面是一个map，key是valueName，value是一个list，list里面是double类型的数据
-        for (String valueName : listY.keySet()) {
+
             //q: listY里面是什么？
             //a: listY里面是一个map，key是valueName，value是一个list，list里面是double类型的数据
-            chart.addSeries(valueName,listX,listY.get(valueName));
+            chart.addSeries(valueName,listX.get(valueName),listY.get(valueName));
+            //进行展示
+            new SwingWrapper<>(chart).displayChart();
         }
 
 
@@ -58,10 +62,36 @@ public class DrawGraph {
         chart.addSeries("attack number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.44,0.22,0.55));
         chart.addSeries("block number",Arrays.asList(5,6,7,8,9),Arrays.asList(0.5,0.4,0.35,0.42,0.35));*/
 
-        //进行展示
-        new SwingWrapper<>(chart).displayChart();
+
     }
 
+    //画折线图
+    public static void drawLineChart(Map<String,List<Integer>> listX, Map<String,List<Double>> listY){
+
+        for (String valueName : listY.keySet()) {
+            // 创建Chart
+            CategoryChart chart = new CategoryChartBuilder()
+                    .width(800)
+                    .height(600)
+                    .title("Number-Probability") // 图表标题)
+                    .xAxisTitle(valueName)
+                    .yAxisTitle("Error probability")
+                    .build();
+
+            //设置图表样式
+            chart.getStyler().setDefaultSeriesRenderStyle(CategorySeries.CategorySeriesRenderStyle.Line);
+
+            //添加数据源
+
+            //q: listY里面是什么？
+            //a: listY里面是一个map，key是valueName，value是一个list，list里面是double类型的数据
+            chart.addSeries(valueName,listX.get(valueName),listY.get(valueName));
+            // 进行展示
+            new SwingWrapper<CategoryChart>(chart).displayChart();
+        }
+
+
+    }
 
     public static void drawGraph(double[] values,int value,String valueName) {
 

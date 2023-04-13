@@ -13,19 +13,19 @@ import static org.apache.commons.math3.util.ArithmeticUtils.pow;
 public class Variable {
 
 
-    @Setter
+
     @Getter
     //区块数量
     private int blockNumber = 10;
 
-    @Setter
+
     @Getter
     //默认hash的大小
     private int hashSize = 12;
-    @Setter
+
     @Getter
     //默认攻击区块的数量
-    private int attackNumber = pow(2,hashSize);
+    private int attackNumber  = pow(2,hashSize-3);;
     @Setter
     @Getter
     private String valueName;
@@ -40,16 +40,31 @@ public class Variable {
         switch (valueName){
             case "blockNumber":
                 this.blockNumber = value;
+                //this.attackNumber = pow(2,hashSize);
                 break;
             case "hashSize":
                 this.hashSize = value;
+                //this.attackNumber = pow(2,hashSize);
                 break;
             case "attackNumber":
-                this.attackNumber = value;
+                this.attackNumber = value;;
                 break;
         }
         this.valueName = valueName;
         this.value = value;
     }
 
+    public void setBlockNumber(int blockNumber) {
+        this.blockNumber = blockNumber;
+        //this.attackNumber = pow(2,hashSize);
+    }
+
+    public void setHashSize(int hashSize) {
+        this.hashSize = hashSize;
+        //this.attackNumber = pow(2,hashSize);
+    }
+
+    public void setAttackNumber(int attackNumber) {
+        this.attackNumber = attackNumber;
+    }
 }
