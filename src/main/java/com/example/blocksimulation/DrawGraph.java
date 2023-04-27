@@ -11,10 +11,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
-import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.CategorySeries;
-import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.*;
+import org.knowm.xchart.style.Styler;
 
 import javax.swing.JFrame;
 /**
@@ -88,6 +86,51 @@ public class DrawGraph {
             chart.addSeries(valueName,listX.get(valueName),listY.get(valueName));
             // 进行展示
             new SwingWrapper<CategoryChart>(chart).displayChart();
+        }
+
+
+    }
+    //画双y轴折线图
+    public static void drawDoubleLineChart(Map<String,List<Integer>> listX, Map<String,List<List<Double>>> listY) {
+
+        XYChart chart = null;
+        for (String valueName : listY.keySet()) {
+            // 创建Chart
+            chart = new XYChartBuilder()
+                    .width(800)
+                    .height(600)
+                    .title("Number-Probability") // 图表标题)
+                    .xAxisTitle(valueName)
+                    .yAxisTitle("Error probability")
+                    .build();
+
+            //设置图表样式
+            //chart.getStyler().setDefaultSeriesRenderStyle(CategorySeries.CategorySeriesRenderStyle.Line);
+            chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
+            // Series
+            XYSeries series1 = chart.addSeries(valueName+" probability", listX.get(valueName), listY.get(valueName).get(0));
+            XYSeries series2 =  chart.addSeries(valueName+" numOfIllegalChain", listX.get(valueName), listY.get(valueName).get(1));
+            series1.setYAxisGroup(0);
+            series2.setYAxisGroup(1);
+
+            // Y-Axis
+            chart.setYAxisGroupTitle(0, "probability");
+            chart.setYAxisGroupTitle(1, "numOfIllegalChain");
+
+
+            chart.getStyler().setYAxisGroupPosition(0, Styler.YAxisPosition.Left);
+            chart.getStyler().setYAxisGroupPosition(1, Styler.YAxisPosition.Right);
+
+
+            //添加数据源
+            // Series
+
+
+            //q: listY里面是什么？
+            //a: listY里面是一个map，key是valueName，value是一个list，list里面是double类型的数据
+            //chart.addSeries(valueName,listX.get(valueName),listY.get(valueName));
+            // 进行展示
+            new SwingWrapper<>(chart).displayChart();
         }
 
 

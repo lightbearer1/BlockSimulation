@@ -24,48 +24,92 @@ public class BlockSimulationApplication {
         Map<String,List<Integer>> listXAxis = new HashMap<>();
         //创建存放数据集合的集合，作为图表的y轴
         Map<String,List<Double>> listYAxis = new HashMap<>();
+        //--------------双曲线部分---------------------
+        //创建存放数据集合的集合，作为图表的y轴,该集合用于显示双曲线图
+        Map<String,List<List<Double>>> listYAxisDouble = new HashMap<>();
+
 
 
         //*******************hashSize的数据*********************
         Variable variableHash = new Variable("hashSize",value);
         //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
-        List<Double> listYAxisForHashSize = new BlockSimulationApplication().loopSimulation(variableHash, endNumber);
+        List<Double> listYAxisForHashSize = new BlockSimulationApplication()
+                .loopSimulation(variableHash, endNumber).get("probability");
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路数量
+        List<Double> listYAxisDoubleForHashSize = new BlockSimulationApplication()
+                .loopSimulation(variableHash, endNumber).get("numOfIllegalChain");
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxisHashsize = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
             listXAxisHashsize.add(i);
         }
-        //将模拟结果存放到集合中
+        //--------------将模拟结果存放到集合中---------------
         listXAxis.put(variableHash.getValueName(),listXAxisHashsize);
+        //-------单线图部分--------
         listYAxis.put(variableHash.getValueName(), listYAxisForHashSize);
+        //--------双线数据源--------
+        //创建一个list用来存放hashsize两条折线的数据
+        List<List<Double>> listYDoubleOfHashsize = new ArrayList<>();
+        listYDoubleOfHashsize.add(listYAxisForHashSize);
+        listYDoubleOfHashsize.add(listYAxisDoubleForHashSize);
+        listYAxisDouble.put(variableHash.getValueName(),listYDoubleOfHashsize);
 
         //****************attackNumber的数据***********************
         Variable variableAttack = new Variable("attackNumber",value);
-        List<Double> listYAxisAttackNumber = new BlockSimulationApplication().loopSimulation(variableAttack, endNumber);
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
+        List<Double> listYAxisAttackNumber = new BlockSimulationApplication()
+                .loopSimulation(variableAttack, endNumber).get("probability");
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路数量
+        List<Double> listYAxisDoubleAttackNumber = new BlockSimulationApplication()
+                .loopSimulation(variableAttack, endNumber).get("numOfIllegalChain");
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxisAttackNumber = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
             listXAxisAttackNumber.add((int) (pow(2,9)-20*12+20*i));
         }
-        //将模拟结果存放到集合中
+        //--------------将模拟结果存放到集合中---------------
         listXAxis.put(variableAttack.getValueName(), listXAxisAttackNumber);
+        //----------------单线数据源------------------
         listYAxis.put(variableAttack.getValueName(), listYAxisAttackNumber);
+        //----------------双线数据源------------------
+        //创建一个list用来存放attackNumber两条折线的数据
+        List<List<Double>> listYDoubleOfAttackNumber = new ArrayList<>();
+        listYDoubleOfAttackNumber.add(listYAxisAttackNumber);
+        listYDoubleOfAttackNumber.add(listYAxisDoubleAttackNumber);
+        listYAxisDouble.put(variableAttack.getValueName(),listYDoubleOfAttackNumber);
+
 
         //*********************block的数据******************************
         Variable variableBlock = new Variable("blockNumber",value);
-        List<Double> listYAxisBlockNumber = new BlockSimulationApplication().loopSimulation(variableBlock, endNumber);
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
+        List<Double> listYAxisBlockNumber = new BlockSimulationApplication()
+                .loopSimulation(variableBlock, endNumber).get("probability");
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路数量
+        List<Double> listYAxisDoubleBlockNumber = new BlockSimulationApplication()
+                .loopSimulation(variableBlock, endNumber).get("numOfIllegalChain");
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxisBlockNumber = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
             listXAxisBlockNumber.add(i);
         }
-        //将模拟结果存放到集合中
+        //--------------将模拟结果存放到集合中---------------
         listXAxis.put(variableBlock.getValueName(), listXAxisBlockNumber);
+        //----------单线数据源------
         listYAxis.put(variableBlock.getValueName(), listYAxisBlockNumber);
+        //----------双线数据源------
+        //创建一个list用来存放attackNumber两条折线的数据
+        List<List<Double>> listYDoubleOfBlockNumber = new ArrayList<>();
+        listYDoubleOfBlockNumber.add(listYAxisBlockNumber);
+        listYDoubleOfBlockNumber.add(listYAxisDoubleBlockNumber);
+        listYAxisDouble.put(variableBlock.getValueName(),listYDoubleOfBlockNumber);
 
-        //调用画图函数
-        DrawGraph.drawGraph2(listXAxis,listYAxis);
-        DrawGraph.drawLineChart(listXAxis,listYAxis);
+        //------------调用画图函数---------------
+        //画直方图
+        //DrawGraph.drawGraph2(listXAxis,listYAxis);
+        //画折线图
+        //DrawGraph.drawLineChart(listXAxis,listYAxis);
+        //画双折线图
+        DrawGraph.drawDoubleLineChart(listXAxis,listYAxisDouble);
         log.debug("          End of the function\n\n");
         //DrawGraph.drawGraph(new BlockSimulationApplication().loopSimulation(variableBlock, endNumber),endNumber-1-value,variableBlock.getValueName());
 
@@ -75,10 +119,12 @@ public class BlockSimulationApplication {
      * 攻击模拟
      * @param variable 一个特殊对象，存放了各个属性变量
      * @param endNumber 攻击模拟的上限
-     * @return 出现错误链路的概率
+     * @return 出现错误链路的概率和数量的集合
      */
-    public List<Double> loopSimulation(Variable variable, int endNumber) {
+    public Map<String,List<Double>> loopSimulation(Variable variable, int endNumber) {
 
+        //创建map集合，用于存放不同参数下的错误链路概率和数量
+        Map<String,List<Double>> map = new HashMap<>();
 
         //创建一个线程，用于发送区块和攻击
         Thread attacker = null;
@@ -99,12 +145,15 @@ public class BlockSimulationApplication {
 
         //作为结果集存放不通参数下的错误链路概率
         List<Double> probabilityList = null;
+        //存放错误链路的数量
+        List<Double> numOfIllegalChainList = null;
         try {
 
-            //q: probabilityList变量是干什么的？
-            //
+            //用于存放不同参数下的错误链路概率
             probabilityList = new ArrayList<>();
 
+            //用于存放不同参数下的错误链路数量
+            numOfIllegalChainList = new ArrayList<>();
 
             //判断选择的是什么变量
             for (int temp = variable.getValue(); temp < endNumber; temp++) {
@@ -156,7 +205,7 @@ public class BlockSimulationApplication {
                       By substituting the given standard deviation s=7.544 and the expected value E (x)=0.479 into the formula, it can be obtained that:
                       N = [(1.645 * 7.544) / 0.479]^2 = 429.54
                      */
-                    if (numOfAllChain >= 500) {
+                    if (numOfAllChain >= 50) {
                         //求得每次模拟结果的数学期望
                         double ex = ((double) resultListTest.size())/(i-1);
                         //计算每次模拟的标准差
@@ -219,12 +268,20 @@ public class BlockSimulationApplication {
 
                 //计算错误链路的概率
                 double probability = 0;
+                //如果链路总数量为0，那么概率为0
                 if(resultListTest.size()==0&&numOfAllChain==0){
                     probability = 0;
-                }
-                else
+                } else
+                    //如果链路总数量不为0，那么概率为错误链路数量除以链路总数量
                     probability = resultListTest.size() / numOfAllChain;
+                //将概率添加到概率集合中
                 probabilityList.add(probability);
+                //将数量添加到数量集合中
+                numOfIllegalChainList.add((double) resultListTest.size());
+
+                //添加概率和数量到map中
+                map.put("probability", probabilityList);
+                map.put("numOfIllegalChain", numOfIllegalChainList);
 
                 if (variable.getValueName().equals("attackNumber")){
                     System.out.println(variable.getValueName() + " is " + attackNumber + ",number of error chains:" + resultListTest.size());
@@ -252,7 +309,7 @@ public class BlockSimulationApplication {
             }
 
         }
-        return probabilityList;
+        return map;
     }
 
 
