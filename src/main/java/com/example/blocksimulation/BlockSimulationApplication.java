@@ -32,12 +32,9 @@ public class BlockSimulationApplication {
 
         //*******************hashSize的数据*********************
         Variable variableHash = new Variable("hashSize",value);
-        //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
-        List<Double> listYAxisForHashSize = new BlockSimulationApplication()
-                .loopSimulation(variableHash, endNumber).get("probability");
-        //调用模拟函数,返回结果集，包含了不同参数下的错误链路数量
-        List<Double> listYAxisDoubleForHashSize = new BlockSimulationApplication()
-                .loopSimulation(variableHash, endNumber).get("numOfIllegalChain");
+        //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率和数量
+        Map<String, List<Double>> hashsizeMap = new BlockSimulationApplication()
+                .loopSimulation(variableHash, endNumber);
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxisHashsize = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
@@ -46,22 +43,21 @@ public class BlockSimulationApplication {
         //--------------将模拟结果存放到集合中---------------
         listXAxis.put(variableHash.getValueName(),listXAxisHashsize);
         //-------单线图部分--------
-        listYAxis.put(variableHash.getValueName(), listYAxisForHashSize);
+        listYAxis.put(variableHash.getValueName(), hashsizeMap.get("probability"));
         //--------双线数据源--------
         //创建一个list用来存放hashsize两条折线的数据
         List<List<Double>> listYDoubleOfHashsize = new ArrayList<>();
-        listYDoubleOfHashsize.add(listYAxisForHashSize);
-        listYDoubleOfHashsize.add(listYAxisDoubleForHashSize);
+        listYDoubleOfHashsize.add(hashsizeMap.get("probability"));
+        listYDoubleOfHashsize.add(hashsizeMap.get("numOfIllegalChain"));
         listYAxisDouble.put(variableHash.getValueName(),listYDoubleOfHashsize);
 
         //****************attackNumber的数据***********************
         Variable variableAttack = new Variable("attackNumber",value);
         //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
-        List<Double> listYAxisAttackNumber = new BlockSimulationApplication()
-                .loopSimulation(variableAttack, endNumber).get("probability");
+        Map<String, List<Double>> attackNumberMap = new BlockSimulationApplication().loopSimulation(variableAttack, endNumber);
+        List<Double> listYAxisAttackNumber = attackNumberMap.get("probability");
         //调用模拟函数,返回结果集，包含了不同参数下的错误链路数量
-        List<Double> listYAxisDoubleAttackNumber = new BlockSimulationApplication()
-                .loopSimulation(variableAttack, endNumber).get("numOfIllegalChain");
+        List<Double> listYAxisDoubleAttackNumber = attackNumberMap.get("numOfIllegalChain");
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxisAttackNumber = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
@@ -79,14 +75,14 @@ public class BlockSimulationApplication {
         listYAxisDouble.put(variableAttack.getValueName(),listYDoubleOfAttackNumber);
 
 
-        //*********************block的数据******************************
+        //*********************blockNumber的数据******************************
         Variable variableBlock = new Variable("blockNumber",value);
         //调用模拟函数,返回结果集，包含了不同参数下的错误链路概率
-        List<Double> listYAxisBlockNumber = new BlockSimulationApplication()
-                .loopSimulation(variableBlock, endNumber).get("probability");
+        Map<String, List<Double>> blockNumberMap = new BlockSimulationApplication()
+                .loopSimulation(variableBlock, endNumber);
+        List<Double> listYAxisBlockNumber = blockNumberMap.get("probability");
         //调用模拟函数,返回结果集，包含了不同参数下的错误链路数量
-        List<Double> listYAxisDoubleBlockNumber = new BlockSimulationApplication()
-                .loopSimulation(variableBlock, endNumber).get("numOfIllegalChain");
+        List<Double> listYAxisDoubleBlockNumber = blockNumberMap.get("numOfIllegalChain");
         //创建集合存放要模拟的区间,作为图表的x轴
         List<Integer> listXAxisBlockNumber = new ArrayList<>();
         for (int i = value;i < endNumber;i++){
@@ -273,7 +269,31 @@ public class BlockSimulationApplication {
                     probability = 0;
                 } else
                     //如果链路总数量不为0，那么概率为错误链路数量除以链路总数量
-                    probability = resultListTest.size() / numOfAllChain;
+                    probability = ((double) resultListTest.size()) / numOfAllChain;
+
+
+                if (variable.getValueName().equals("attackNumber")){
+                    System.out.println(variable.getValueName() + " is " + attackNumber + ",number of error chains:" + resultListTest.size());
+                    System.out.println(variable.getValueName() + " is " + attackNumber + ",number of all chains:" + numOfAllChain);
+                    System.out.println(variable.getValueName() + " is " + attackNumber + ",Probability of erroneous links :" + probability);
+                    System.out.println("——————————————————————————————");
+
+                    log.debug(variable.getValueName() + " is " + attackNumber + ",number of error chains:" + resultListTest.size());
+                    log.debug(variable.getValueName() + " is " + attackNumber + ",number of all chains:" + numOfAllChain);
+                    log.debug(variable.getValueName() + " is " + attackNumber + ",Probability of erroneous links :" + probability);
+                    log.debug("——————————————————————————————");
+                }else {
+                    System.out.println(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
+                    System.out.println(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
+                    System.out.println(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
+                    System.out.println("——————————————————————————————");
+
+                    log.debug(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
+                    log.debug(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
+                    log.debug(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
+                    log.debug("——————————————————————————————");
+                }
+
                 //将概率添加到概率集合中
                 probabilityList.add(probability);
                 //将数量添加到数量集合中
@@ -282,18 +302,6 @@ public class BlockSimulationApplication {
                 //添加概率和数量到map中
                 map.put("probability", probabilityList);
                 map.put("numOfIllegalChain", numOfIllegalChainList);
-
-                if (variable.getValueName().equals("attackNumber")){
-                    System.out.println(variable.getValueName() + " is " + attackNumber + ",number of error chains:" + resultListTest.size());
-                    System.out.println(variable.getValueName() + " is " + attackNumber + ",number of all chains:" + numOfAllChain);
-                    System.out.println(variable.getValueName() + " is " + attackNumber + ",Probability of erroneous links :" + probability);
-                    System.out.println("——————————————————————————————");
-                }else {
-                    System.out.println(variable.getValueName() + " is " + temp + ",number of error chains:" + resultListTest.size());
-                    System.out.println(variable.getValueName() + " is " + temp + ",number of all chains:" + numOfAllChain);
-                    System.out.println(variable.getValueName() + " is " + temp + ",Probability of erroneous links :" + probability);
-                    System.out.println("——————————————————————————————");
-                }
 
             }
         } catch (Exception e) {

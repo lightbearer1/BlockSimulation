@@ -63,8 +63,11 @@ public class Receiver {
             //*创建新链路
             //只有当初始区块以外的区块进入接收才会判断
             if (index>1){
-                //如果当前传入区块的preHash和上一个区块的preHash相同
-                if (Arrays.equals(block.getPreviousHash(), chain.get(chain.size()-1).getPreviousHash())) {
+                //如果当前传入区块的preHash和上一个区块的preHash相同,并且当前区块的hash和上一个区块的hash不同
+                //
+                if (Arrays.equals(block.getPreviousHash(), chain.get(chain.size()-1).getPreviousHash())
+                        && !Arrays.equals(block.getHash(), chain.get(chain.size()-1).getHash())
+                ) {
                     //创建一个新的链路分支，并且将当前的链路复制给新的分支
                     List<Block> newChain = new ArrayList<>(chain);
                     //这一步是把当前链路的上一个区块和当前接收区块替换，从而创建新链路

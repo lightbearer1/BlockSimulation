@@ -65,11 +65,11 @@ public class Attacker extends Thread{
 
     public void run() {
         try {
-
+            int actualIndex = 0;
             while (shouldExecute) {
 
                 boolean[] previousHash = generateHash(hashSize);
-                int stopAttack = 0;
+
                 //此处理论上应该采用泊松分布来分配攻击次数，但是由于多线程的特性也近似的达到了想要的效果
                 for (int i = 0; i < blockNumber - 1; i++) {
                     for (int j = 0; j < attackNum; j++) {
@@ -81,6 +81,8 @@ public class Attacker extends Thread{
                         block.setPreviousHash(previousHash);
                         //设置当前区块的hash
                         block.setHash(generateHash(hashSize));
+                        //设置当前区块的index
+                        block.setActualIndex(actualIndex++);
                         //把当前区块的hash存入临时变量，下次循环的时候赋值给下个区块的previousHash属性
                         previousHash = block.getHash();
                         //发送区块

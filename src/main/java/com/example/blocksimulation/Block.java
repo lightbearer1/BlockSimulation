@@ -3,14 +3,16 @@ package com.example.blocksimulation;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
-
 /**
  * 作者:wyq
  * 日期:2023/2/4 19:57
  * 描述:
  */
 public class Block {
+    @Getter
+    @Setter
+    //区块在生产出来时的序号
+    private int actualIndex;
     @Getter
     @Setter
     //区块链的序号
@@ -61,6 +63,7 @@ public class Block {
     public String toString() {
         return "Block{" +
                 "index=" + index +
+                ", actualIndex=" + actualIndex +
                 ", data=" + new String(data) +
                 ", hash=" + booleanArrayToBinaryString(hash) +
                 ", previousHash=" + booleanArrayToBinaryString(previousHash) +

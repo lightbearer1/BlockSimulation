@@ -93,10 +93,10 @@ public class DrawGraph {
     //画双y轴折线图
     public static void drawDoubleLineChart(Map<String,List<Integer>> listX, Map<String,List<List<Double>>> listY) {
 
-        XYChart chart = null;
+
         for (String valueName : listY.keySet()) {
             // 创建Chart
-            chart = new XYChartBuilder()
+            XYChart chart = new XYChartBuilder()
                     .width(800)
                     .height(600)
                     .title("Number-Probability") // 图表标题)

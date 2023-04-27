@@ -63,6 +63,8 @@ public class Sender extends Thread{
 
                 // code to run in Thread A
                 boolean[] previousHash = new boolean[]{true, true, true, true};
+                //区块的实际编号
+                int actualIndex = 0;
                 //System.out.println("Message of sender is:\n");
                 for (int i = 0; i < blockNumber; i++) {
                     //synchronized (this) {
@@ -72,6 +74,8 @@ public class Sender extends Thread{
                     Block block = new Block();
                     //把前一个区块的hash存入当前区块
                     block.setPreviousHash(previousHash);
+                    //设置当前区块的index
+                    block.setActualIndex(actualIndex++);
                     if (i == blockNumber - 1) {
                         block.setData("End Chain".getBytes());
                     } else {
