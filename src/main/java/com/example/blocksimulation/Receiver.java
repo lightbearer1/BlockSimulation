@@ -65,8 +65,8 @@ public class Receiver {
             if (index>1){
                 //如果当前传入区块的preHash和上一个区块的preHash相同,并且当前区块的hash和上一个区块的hash不同
                 //
-                if (Arrays.equals(block.getPreviousHash(), chain.get(chain.size()-1).getPreviousHash())
-                        && !Arrays.equals(block.getHash(), chain.get(chain.size()-1).getHash())
+                if (!block.isRead() && (Arrays.equals(block.getPreviousHash(), chain.get(chain.size()-1).getPreviousHash())
+                        && !Arrays.equals(block.getHash(), chain.get(chain.size()-1).getHash()))
                 ) {
                     //创建一个新的链路分支，并且将当前的链路复制给新的分支
                     List<Block> newChain = new ArrayList<>(chain);
@@ -81,6 +81,8 @@ public class Receiver {
                     }
                     //给链路集合添加新建的链路
                     blockChainNumber.add(newChain);
+                    //标记该区块已经被读取过
+                    block.setRead(true);
                     //return "true";
                     recStatu = true;
 

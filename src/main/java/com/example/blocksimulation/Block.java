@@ -34,6 +34,10 @@ public class Block {
     @Getter
     //一个用于标记链路是否含有非法区块的特殊属性，默认为true
     private boolean isLegal = true;
+    @Getter
+    @Setter
+    //标注该区块是否已经被读取检测过
+    private boolean isRead = false;
     /*@Getter
     //用于记录该区块以及该区块之前的区块地址
     Map<Integer,Integer> blockAddress = new HashMap<Integer,Integer>();*/

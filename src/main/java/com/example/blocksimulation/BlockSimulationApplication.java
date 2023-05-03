@@ -104,6 +104,7 @@ public class BlockSimulationApplication {
         //DrawGraph.drawGraph2(listXAxis,listYAxis);
         //画折线图
         //DrawGraph.drawLineChart(listXAxis,listYAxis);
+        System.out.println(listYAxisDouble);
         //画双折线图
         DrawGraph.drawDoubleLineChart(listXAxis,listYAxisDouble);
         log.debug("          End of the function\n\n");
