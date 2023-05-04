@@ -1,6 +1,7 @@
 package com.example.blocksimulation;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Map;
@@ -12,9 +13,13 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.statistics.HistogramDataset;
 import org.knowm.xchart.*;
+import org.knowm.xchart.internal.chartpart.Axis;
 import org.knowm.xchart.style.Styler;
 
 import javax.swing.JFrame;
+
+import static com.example.blocksimulation.BlockSimulationApplication.maxChainNumber;
+
 /**
  * Author: wyq
  * Date  : 2023/2/21 23:32
@@ -101,17 +106,25 @@ public class DrawGraph {
                     .height(600)
                     .title("Number-Probability") // 图表标题)
                     .xAxisTitle(valueName)
-                    .yAxisTitle("Error probability")
                     .build();
 
             //设置图表样式
             //chart.getStyler().setDefaultSeriesRenderStyle(CategorySeries.CategorySeriesRenderStyle.Line);
             chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNW);
+            chart.getStyler().setYAxisMax(0.1);
             // Series
             XYSeries series1 = chart.addSeries(valueName+" probability", listX.get(valueName), listY.get(valueName).get(0));
             XYSeries series2 =  chart.addSeries(valueName+" numOfIllegalChain", listX.get(valueName), listY.get(valueName).get(1));
             series1.setYAxisGroup(0);
             series2.setYAxisGroup(1);
+            // 获取左侧的y轴对象,设置左侧y轴的最小值和最大值
+            chart.getStyler().setYAxisMin(0,0.0);
+            chart.getStyler().setYAxisMax(0,1.0);
+            // 获取右侧的y轴对象,设置右侧y轴的最小值和最大值
+            chart.getStyler().setYAxisMin(1,0.0);
+            chart.getStyler().setYAxisMax(1, (double) maxChainNumber+10);
+
+
 
             // Y-Axis
             chart.setYAxisGroupTitle(0, "probability");
@@ -134,6 +147,17 @@ public class DrawGraph {
         }
 
 
+    }
+
+    //处理传入的绘图数据，避免两个y轴的折线重合
+    private Map<String,List<List<Double>>>  changeData(Map<String,List<List<Double>>> listY){
+        for (String valueName : listY.keySet()) {
+
+            List<List<Double>> list = listY.get(valueName);
+
+        }
+
+        return listY;
     }
 
     public static void drawGraph(double[] values,int value,String valueName) {

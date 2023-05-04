@@ -12,13 +12,15 @@ import static java.lang.Math.pow;
 @Slf4j
 public class BlockSimulationApplication {
     static boolean overThread = false;
-
+    //每次模拟的最大链路数量
+    static int maxChainNumber = 50;
 
     public static void main(String[] args) throws InterruptedException {
         log.debug("<---------------New Function--------------->");
         //TODO 最外围添加一个循环，测试在不同参数下产生的不同的链路数量情况
         int endNumber =16;
         int value = 8;
+
 
         //创建存放数据集合的集合，作为图表的x轴
         Map<String,List<Integer>> listXAxis = new HashMap<>();
@@ -202,7 +204,7 @@ public class BlockSimulationApplication {
                       By substituting the given standard deviation s=7.544 and the expected value E (x)=0.479 into the formula, it can be obtained that:
                       N = [(1.645 * 7.544) / 0.479]^2 = 429.54
                      */
-                    if (numOfAllChain >= 50) {
+                    if (numOfAllChain >= maxChainNumber) {
                         //求得每次模拟结果的数学期望
                         double ex = ((double) resultListTest.size())/(i-1);
                         //计算每次模拟的标准差
@@ -210,7 +212,7 @@ public class BlockSimulationApplication {
                         System.out.println("__________________________");
                         System.out.println("Number of loops:" + (i-1));
                         System.out.println("Expected value is:" + ex);
-                        System.out.println("Variance is :"+variance);
+                        System.out.println("Variance is :"+variance+"\n");
                         break;
                     }
 
